@@ -54,6 +54,7 @@ namespace MusicUnpacker
                 {
                     _zipPath = value;
                     OnPropertyChanged("ZipPath");
+                    Console.WriteLine("ZipPath changed to {0}", value);
                 }
             }
         }
