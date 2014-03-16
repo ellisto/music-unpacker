@@ -18,6 +18,8 @@ namespace MusicUnpacker
         private string _zipPath;
         private AlbumInfo _album;
         private string _tempPath;
+        private bool _isBusy;
+        private string _busyMessage;
 
         private List<string> _cleanUpPaths;
 
@@ -56,10 +58,12 @@ namespace MusicUnpacker
                 {
                     _zipPath = value;
                     OnPropertyChanged("ZipPath");
-                    
+
                     //TODO: add a spinner or something, because this can take a while sometimes.
                     if (_zipPath != null && _zipPath != string.Empty)
+                    {
                         ProcessNewZip();
+                    }
                 }
             }
         }
@@ -77,11 +81,55 @@ namespace MusicUnpacker
             }
         }
 
+        public bool IsBusy
+        {
+            get { return _isBusy; }
+            set
+            {
+                if (value != _isBusy)
+                {
+                    _isBusy = value;
+                    OnPropertyChanged("IsBusy");
+                }
+            }
+        }
+
+        public string BusyMessage
+        {
+            get
+            {
+                return _busyMessage;
+            }
+            set
+            {
+                if (value != _busyMessage)
+                {
+                    _busyMessage = value;
+                    OnPropertyChanged("BusyMessage");
+                }
+            }
+        }
+
+        public void SetBusy(string message = null)
+        {
+            IsBusy = true;
+            if (message != null)
+            {
+                BusyMessage = message;
+            }
+        }
+
+        public void UnsetBusy()
+        {
+            IsBusy = false;
+        }
+
         /// <summary>
         /// Takes zip specified in ZipPath, extracts it to a temp dir, reads ID3 tags to determine album title, artist, and genre
         /// </summary>
-        public void ProcessNewZip()
+        public async void ProcessNewZip()
         {
+            SetBusy("Processing...");
             try
             {
                 //get a temp folder
@@ -91,8 +139,8 @@ namespace MusicUnpacker
 
                 using (ZipArchive archive = ZipFile.Open(ZipPath, ZipArchiveMode.Read))
                 {
-                    archive.ExtractToDirectory(_tempPath);
-                    //MessageBox.Show(string.Format("Files extracted to {0}.", _tempPath));
+                    await Task.Factory.StartNew(() => archive.ExtractToDirectory(_tempPath));
+                    Console.WriteLine("Files extracted to {0}.", _tempPath);
                     Album = GetAlbumInfo(_tempPath);
                 }
             }
@@ -100,6 +148,7 @@ namespace MusicUnpacker
             {
                 MessageBox.Show(string.Format("Error: {0}", e.Message), "Error");
             }
+            UnsetBusy();
         }
 
         /// <summary>
@@ -107,6 +156,7 @@ namespace MusicUnpacker
         /// </summary>
         public void ImportAlbum()
         {
+            SetBusy("Importing album...");
             //TODO: get a desired path from user
             try
             {
@@ -129,6 +179,7 @@ namespace MusicUnpacker
                 //TODO: improve exception handling
                 MessageBox.Show("Error: " + e.Message);
             }
+            UnsetBusy();
         }
 
         /// <summary>

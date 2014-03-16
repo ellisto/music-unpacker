@@ -4,33 +4,35 @@
         xmlns:mu="clr-namespace:MusicUnpacker"
         xmlns:ctl="clr-namespace:MusicUnpacker.Controls"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         Title="Music Unpacker" SizeToContent="Height" Width="300" Closed="Window_Closed">
-    
-    <Grid>
-        <Grid.DataContext>
-            <mu:ViewModel x:Name="_vm"/>
-        </Grid.DataContext>
-        
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <xctk:BusyIndicator IsBusy="{Binding ElementName=_vm,Path=IsBusy}" BusyContent="{Binding ElementName=_vm, Path=BusyMessage}">
+        <Grid>
+            <Grid.DataContext>
+                <mu:ViewModel x:Name="_vm"/>
+            </Grid.DataContext>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <TextBlock Text="Music Library:" Margin="6"/>
-        <TextBox Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding MusicLibraryPath}" Margin="6"/>
-        <TextBlock Grid.Row="1" Text="Zip to import:" Margin="6"/>
-        <ctl:BrowseBox Grid.Row="1" Grid.Column="1" Filepath="{Binding ZipPath, Mode=TwoWay}"/>
-        
-        <ctl:AlbumInfoViewer Grid.Row="2" Grid.ColumnSpan="2" DataContext="{Binding Album}"/>
-        <!--TODO: use a command instead of click handler-->
-        <Button Grid.Row="3" Grid.ColumnSpan="2" Content="Import Album" Margin="6" Click="Button_Click"/>
-    </Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Music Library:" Margin="6"/>
+            <TextBox Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding MusicLibraryPath}" Margin="6"/>
+            <TextBlock Grid.Row="1" Text="Zip to import:" Margin="6"/>
+            <ctl:BrowseBox Grid.Row="1" Grid.Column="1" Filepath="{Binding ZipPath, Mode=TwoWay}"/>
+
+            <ctl:AlbumInfoViewer Grid.Row="2" Grid.ColumnSpan="2" DataContext="{Binding Album}"/>
+            <!--TODO: use a command instead of click handler-->
+            <Button Grid.Row="3" Grid.ColumnSpan="2" Content="Import Album" Margin="6" Click="Button_Click"/>
+        </Grid>
+    </xctk:BusyIndicator>
 </Window>

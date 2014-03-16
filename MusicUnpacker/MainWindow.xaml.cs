@@ -27,7 +27,7 @@ namespace MusicUnpacker
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            _vm.ImportAlbum();     
+            _vm.ImportAlbum();
         }
 
         private void Window_Closed(object sender, EventArgs e)
