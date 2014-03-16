@@ -4,7 +4,7 @@
         xmlns:mu="clr-namespace:MusicUnpacker"
         xmlns:ctl="clr-namespace:MusicUnpacker.Controls"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        Title="Music Unpacker" SizeToContent="Height" Width="300">
+        Title="Music Unpacker" SizeToContent="Height" Width="300" Closed="Window_Closed">
     
     <Grid>
         <Grid.DataContext>

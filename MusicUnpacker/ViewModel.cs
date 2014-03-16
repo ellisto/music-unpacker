@@ -19,7 +19,14 @@ namespace MusicUnpacker
         private AlbumInfo _album;
         private string _tempPath;
 
+        private List<string> _cleanUpPaths;
+
         public const string VARIOUSARTISTS = "Various Artists";
+
+        public ViewModel()
+        {
+            _cleanUpPaths = new List<string>();
+        }
 
         public string MusicLibraryPath
         {
@@ -49,6 +56,8 @@ namespace MusicUnpacker
                 {
                     _zipPath = value;
                     OnPropertyChanged("ZipPath");
+                    
+                    //TODO: add a spinner or something, because this can take a while sometimes.
                     if (_zipPath != null && _zipPath != string.Empty)
                         ProcessNewZip();
                 }
@@ -78,6 +87,7 @@ namespace MusicUnpacker
                 //get a temp folder
                 _tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
                 Directory.CreateDirectory(_tempPath);
+                _cleanUpPaths.Add(_tempPath);
 
                 using (ZipArchive archive = ZipFile.Open(ZipPath, ZipArchiveMode.Read))
                 {
@@ -109,7 +119,7 @@ namespace MusicUnpacker
 
                 foreach (var sourcePath in Directory.EnumerateFiles(_tempPath))
                 {
-                    var destPath = Path.Combine(targetPath,Path.GetFileName(sourcePath));
+                    var destPath = Path.Combine(targetPath, Path.GetFileName(sourcePath));
                     System.IO.File.Copy(sourcePath, destPath);
                 }
                 Process.Start(targetPath);
@@ -128,6 +138,7 @@ namespace MusicUnpacker
         {
             var albumInfo = new AlbumInfo() { Title = string.Empty, Artist = string.Empty, Genre = string.Empty };
 
+            //TODO: iterate down into file structure until we find mp3s, in case the source zip had folders inside.
             foreach (var filename in Directory.EnumerateFiles(sourceDirectoryPath))
             {
                 TagLib.File tagfile = TagLib.File.Create(Path.Combine(sourceDirectoryPath, filename));
@@ -156,6 +167,21 @@ namespace MusicUnpacker
                 }
             }
             return albumInfo;
+        }
+
+        public void CleanUp()
+        {
+            foreach (var tempDir in _cleanUpPaths.Select(p => new DirectoryInfo(p)))
+            {
+                try
+                {
+                    tempDir.Delete(true);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error cleaning up directory {0}: {1}", tempDir.FullName, e.Message);
+                }
+            }
         }
 
         #region INotifyPropertyChanged
