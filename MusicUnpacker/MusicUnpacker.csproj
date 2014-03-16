@@ -62,10 +62,18 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AlbumInfo.cs" />
+    <Compile Include="Controls\AlbumInfoViewer.xaml.cs">
+      <DependentUpon>AlbumInfoViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\BrowseBox.xaml.cs">
       <DependentUpon>BrowseBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MockAlbumInfo.cs" />
     <Compile Include="ViewModel.cs" />
+    <Page Include="Controls\AlbumInfoViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\BrowseBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -3,13 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mu="clr-namespace:MusicUnpacker"
         xmlns:ctl="clr-namespace:MusicUnpacker.Controls"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         Title="Music Unpacker" SizeToContent="Height" Width="300">
     
     <Grid>
         <Grid.DataContext>
             <mu:ViewModel x:Name="_vm"/>
         </Grid.DataContext>
-
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -26,15 +27,9 @@
         <TextBlock Text="Music Library:" Margin="6"/>
         <TextBox Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding MusicLibraryPath}" Margin="6"/>
         <TextBlock Grid.Row="1" Text="Zip to import:" Margin="6"/>
-        <!--<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ZipPath}" Margin="6"/>-->
         <ctl:BrowseBox Grid.Row="1" Grid.Column="1" Filepath="{Binding ZipPath, Mode=TwoWay}"/>
-    
-        <StackPanel Grid.Row="2" Grid.ColumnSpan="2">
-            <TextBlock Text="{Binding Album.Title, StringFormat=Album:{0}}" />
-            <TextBlock Text="{Binding Album.Artist, StringFormat=Artist:{0}}" />
-            <TextBlock Text="{Binding Album.Genre, StringFormat=Genre:{0}}" />
-        </StackPanel>
         
+        <ctl:AlbumInfoViewer Grid.Row="2" Grid.ColumnSpan="2" DataContext="{Binding Album}"/>
         <!--TODO: use a command instead of click handler-->
         <Button Grid.Row="3" Grid.ColumnSpan="2" Content="{Binding NextStep}" Margin="6" Click="Button_Click"/>
     </Grid>
