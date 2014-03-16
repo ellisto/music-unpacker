@@ -27,7 +27,7 @@ namespace MusicUnpacker
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            _vm.UnpackZip();       
+            _vm.ImportAlbum();     
         }
     }
 }

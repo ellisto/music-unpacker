@@ -31,6 +31,6 @@
         
         <ctl:AlbumInfoViewer Grid.Row="2" Grid.ColumnSpan="2" DataContext="{Binding Album}"/>
         <!--TODO: use a command instead of click handler-->
-        <Button Grid.Row="3" Grid.ColumnSpan="2" Content="{Binding NextStep}" Margin="6" Click="Button_Click"/>
+        <Button Grid.Row="3" Grid.ColumnSpan="2" Content="Import Album" Margin="6" Click="Button_Click"/>
     </Grid>
 </Window>

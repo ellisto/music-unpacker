@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -15,16 +16,10 @@ namespace MusicUnpacker
     {
         private string _musicLibraryPath;
         private string _zipPath;
-        private string _nextStep;
-        private Step _currentStep;
         private AlbumInfo _album;
+        private string _tempPath;
 
         public const string VARIOUSARTISTS = "Various Artists";
-
-        public ViewModel()
-        {
-            CurrentStep = Step.Initial;
-        }
 
         public string MusicLibraryPath
         {
@@ -54,7 +49,8 @@ namespace MusicUnpacker
                 {
                     _zipPath = value;
                     OnPropertyChanged("ZipPath");
-                    Console.WriteLine("ZipPath changed to {0}", value);
+                    if (_zipPath != null && _zipPath != string.Empty)
+                        ProcessNewZip();
                 }
             }
         }
@@ -72,57 +68,56 @@ namespace MusicUnpacker
             }
         }
 
-        public Step CurrentStep
-        {
-            get { return _currentStep; }
-            set
-            {
-                if (value != _currentStep)
-                {
-                    _currentStep = value;
-                    OnPropertyChanged("CurrentStep");
-                    OnPropertyChanged("NextStep");
-                }
-            }
-        }
-
-        public string NextStep
-        {
-            get {
-                switch (CurrentStep)
-                {
-                    case Step.Initial:
-                        return "Read In File";
-                    case Step.Extract:
-                        return "Import to Music Library";
-                    default:
-                        return "Clear";
-                }
-            }
-        }
-
         /// <summary>
-        /// Takes zip specified in ZipPath and unpacks it into the music library rooted at MusicLibraryPath
+        /// Takes zip specified in ZipPath, extracts it to a temp dir, reads ID3 tags to determine album title, artist, and genre
         /// </summary>
-        public void UnpackZip()
+        public void ProcessNewZip()
         {
             try
             {
                 //get a temp folder
-                var extractPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-                Directory.CreateDirectory(extractPath);
+                _tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+                Directory.CreateDirectory(_tempPath);
 
                 using (ZipArchive archive = ZipFile.Open(ZipPath, ZipArchiveMode.Read))
                 {
-                    archive.ExtractToDirectory(extractPath);
-                    MessageBox.Show(string.Format("Files extracted to {0}.", extractPath));
-                    Album = GetAlbumInfo(extractPath);
-                    //TODO: move files to target
+                    archive.ExtractToDirectory(_tempPath);
+                    //MessageBox.Show(string.Format("Files extracted to {0}.", _tempPath));
+                    Album = GetAlbumInfo(_tempPath);
                 }
             }
             catch (Exception e)
             {
                 MessageBox.Show(string.Format("Error: {0}", e.Message), "Error");
+            }
+        }
+
+        /// <summary>
+        /// Takes currently selected album and imports it into specified music library.
+        /// </summary>
+        public void ImportAlbum()
+        {
+            //TODO: get a desired path from user
+            try
+            {
+                var targetPath = Path.Combine(MusicLibraryPath, Album.Artist, Album.Title);
+                //for now, using LIBRARY/ARTIST/ALBUM/*.mp3
+                if (!Directory.Exists(targetPath))
+                {
+                    Directory.CreateDirectory(targetPath);
+                }
+
+                foreach (var sourcePath in Directory.EnumerateFiles(_tempPath))
+                {
+                    var destPath = Path.Combine(targetPath,Path.GetFileName(sourcePath));
+                    System.IO.File.Copy(sourcePath, destPath);
+                }
+                Process.Start(targetPath);
+            }
+            catch (Exception e)
+            {
+                //TODO: improve exception handling
+                MessageBox.Show("Error: " + e.Message);
             }
         }
 
@@ -174,12 +169,5 @@ namespace MusicUnpacker
             }
         }
         #endregion
-    }
-
-    public enum Step
-    {
-        Initial,
-        Extract,
-        Import
     }
 }
