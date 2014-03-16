@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mu="clr-namespace:MusicUnpacker"
              mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="125">
+             d:DesignHeight="81" d:DesignWidth="173">
     <UserControl.Resources>
         <mu:MockAlbumInfo x:Key="DesignViewModel"/>
     </UserControl.Resources>
@@ -17,11 +17,14 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <TextBlock Text="Album: " HorizontalAlignment="Right"/><TextBlock Grid.Column="1" Text="{Binding Title}"/>
-        <TextBlock Grid.Row="1" Text="Artist: " HorizontalAlignment="Right"/><TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Artist}"/>
-        <TextBlock Grid.Row="2" Text="Genre: " HorizontalAlignment="Right"/><TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Genre}" />
+        <TextBlock Text="Album: " HorizontalAlignment="Right" Margin="6 6 0 6"/>
+        <TextBox Grid.Column="1" Text="{Binding Title}" Margin="6"/>
+        <TextBlock Grid.Row="1" Text="Artist: " HorizontalAlignment="Right" Margin="6 0 0 6"/>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Artist}" Margin="6 0 6 6"/>
+        <TextBlock Grid.Row="2" Text="Genre: " HorizontalAlignment="Right" Margin="6 0 0 6"/>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Genre}" Margin="6 0 6 6"/>
     </Grid>
 </UserControl>
