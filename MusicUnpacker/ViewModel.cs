@@ -30,6 +30,7 @@ namespace MusicUnpacker
             _cleanUpPaths = new List<string>();
         }
 
+        //TODO: persist MusicLibraryPath in an App.Settings or similar
         public string MusicLibraryPath
         {
             get
@@ -192,29 +193,37 @@ namespace MusicUnpacker
             //TODO: iterate down into file structure until we find mp3s, in case the source zip had folders inside.
             foreach (var filename in Directory.EnumerateFiles(sourceDirectoryPath))
             {
-                TagLib.File tagfile = TagLib.File.Create(Path.Combine(sourceDirectoryPath, filename));
-
-                //n.b. we just take the first title we see; assuming zip has only one album.
-                //TODO: support multiple albums per zip
-                if (albumInfo.Title == string.Empty && tagfile.Tag.Album != null)
+                try
                 {
-                    albumInfo.Title = tagfile.Tag.Album;
+                    TagLib.File tagfile = TagLib.File.Create(Path.Combine(sourceDirectoryPath, filename));
+
+                    //n.b. we just take the first title we see; assuming zip has only one album.
+                    //TODO: support multiple albums per zip
+                    if (albumInfo.Title == string.Empty && tagfile.Tag.Album != null)
+                    {
+                        albumInfo.Title = tagfile.Tag.Album;
+                    }
+
+                    // set artist; if more than one track has different artists, set artist to VARIOUSARTISTS constant
+                    //TODO: support multiple artists
+                    var tagArtist = tagfile.Tag.FirstAlbumArtist;
+                    if (albumInfo.Artist != VARIOUSARTISTS && tagArtist != null && tagArtist != albumInfo.Artist)
+                    {
+                        albumInfo.Artist = (albumInfo.Artist == string.Empty) ? tagArtist : VARIOUSARTISTS;
+                    }
+
+                    //take the first genre we see and use it for the whole album.
+                    //TODO: support multiple genres
+                    var tagGenre = tagfile.Tag.FirstGenre;
+                    if (albumInfo.Genre == string.Empty && tagGenre != null)
+                    {
+                        albumInfo.Genre = tagGenre;
+                    }
                 }
-
-                // set artist; if more than one track has different artists, set artist to VARIOUSARTISTS constant
-                //TODO: support multiple artists
-                var tagArtist = tagfile.Tag.FirstAlbumArtist;
-                if (albumInfo.Artist != VARIOUSARTISTS && tagArtist != null && tagArtist != albumInfo.Artist)
+                catch (TagLib.UnsupportedFormatException e)
                 {
-                    albumInfo.Artist = (albumInfo.Artist == string.Empty) ? tagArtist : VARIOUSARTISTS;
-                }
-
-                //take the first genre we see and use it for the whole album.
-                //TODO: support multiple genres
-                var tagGenre = tagfile.Tag.FirstGenre;
-                if (albumInfo.Genre == string.Empty && tagGenre != null)
-                {
-                    albumInfo.Genre = tagGenre;
+                    //there might be unsupported files in the zip, like pdf liner notes or cover art; skip these.
+                    continue;
                 }
             }
             return albumInfo;
