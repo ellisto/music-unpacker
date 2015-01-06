@@ -28,6 +28,7 @@ namespace MusicUnpacker
         public ViewModel()
         {
             _cleanUpPaths = new List<string>();
+            MusicLibraryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
         }
 
         //TODO: persist MusicLibraryPath in an App.Settings or similar
